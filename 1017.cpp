@@ -57,15 +57,20 @@ int main()
                 time = availableTime[i];
             }
         }
-        int wait = availableTime[window] - cur.first;
-        waitTime[i] = wait;
-        availableTime[window] += cur.second;
+        if (time >= 61201) {
+            waitTime[i] = 0;
+            //count--;
+        }
+        else {
+            waitTime[i] = availableTime[window] - cur.first;
+            availableTime[window] += cur.second;
+        }
     }
     double totalTime = 0;
     for (int i = 0; i < count; i++) {
         totalTime += waitTime[i];
     }
-    double k = count * 60;
+    double k = count * 60.0;
     double res = totalTime / k;
     printf("%.1f", res);
     return 0;
