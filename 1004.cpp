@@ -29,11 +29,14 @@ int levelCount() {
     Tree[1].level = 0;
     Q.push(Tree[1]);
     int maxlevel = -1;
+    //层序一般就是利用队列
     while (!Q.empty()) {
         Node tmp = Q.front();
         Q.pop();
+        //一边遍历队列，一边对每个节点的level进行赋值
         if (tmp.level > maxlevel)
             maxlevel = tmp.level;
+        //用于记录结果的值独立存储，方便不同功能之间调用和操作
         if (tmp.childCount == 0)
             ++level[tmp.level];
         else {
