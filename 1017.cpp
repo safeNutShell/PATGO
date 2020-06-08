@@ -11,6 +11,25 @@
 
 using namespace std;
 
+int main()
+{
+    
+    return 0;
+}
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <string>
+#include <cstring>
+#include <math.h>
+#include <vector>
+#include <map>
+#include <queue>
+#define INT_MAX 2147483647
+
+using namespace std;
+
 //N表示顾客数，K表示窗口数
 int N, K;
 
@@ -37,6 +56,8 @@ int main()
         if (tmp >= 61201)
             continue;
         int tmp2 = process * 60;
+        //注意这里是第一个关键点，即每名顾客最多服务一小时
+        tmp2 = tmp2 <= 3600 ? tmp2 : 3600;
         pair<int, int> a = make_pair(tmp, tmp2);
         customer.push_back(a);
     }
@@ -46,32 +67,28 @@ int main()
         availableTime[i] = 28800;
     }
     int count = customer.size();
-    int* waitTime = new int[count];
+    double totalTime = 0;
     for (int i = 0; i < count; i++) {
         pair<int, int> cur = customer[i];
-        int window = 0;
-        int time = availableTime[window];
-        for (int i = 1; i < K; i++) {
+        int window = -1;
+        int time = INT_MAX;
+        for (int i = 0; i < K; i++) {
             if (availableTime[i] < time) {
                 window = i;
                 time = availableTime[i];
             }
         }
-        if (time >= 61201) {
-            waitTime[i] = 0;
-            //count--;
+        //注意这里是第二个关键点，即存在窗口已空而顾客暂时没到的情况
+        //只要17:00之前到，该顾客就一定会服务，不存在排队超时而排除顾客的情况
+        if (availableTime[window] < customer[i].first) {
+            availableTime[window] = customer[i].first + customer[i].second;
         }
         else {
-            waitTime[i] = availableTime[window] - cur.first;
-            availableTime[window] += cur.second;
+            totalTime += availableTime[window] - customer[i].first;
+            availableTime[window] += customer[i].second;
         }
+
     }
-    double totalTime = 0;
-    for (int i = 0; i < count; i++) {
-        totalTime += waitTime[i];
-    }
-    double k = count * 60.0;
-    double res = totalTime / k;
-    printf("%.1f", res);
+    printf("%.1f\n", totalTime / (60 * customer.size()));
     return 0;
 }
