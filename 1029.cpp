@@ -27,6 +27,6 @@ int main() {
     //这题简单了，还以为会超时……
     sort(ans.begin(), ans.end());
     int mid = ans.size() / 2 - (1 - ans.size() % 2);
-    printf("%d", ans[mid]);
+    printf("%lld", ans[mid]);
     return 0;
 }
