@@ -13,16 +13,31 @@ using namespace std;
 
 int main() {
     int add1, add2, N;
-    map<int, pair<char, int>> ans;
-    scanf_s("%d %d %d", &add1, &add2, &N);
+    map<int, int> ans;
+    scanf("%d %d %d", &add1, &add2, &N);
     int curAdd, nextAdd;
     char c;
     for (int i = 0; i < N; i++) {
-        scanf_s("%d %c %d", &curAdd, &c, 1, &nextAdd);
-        if (ans.count(nextAdd) == 0)
-            ans[nextAdd] = make_pair(c, curAdd);
-        else
-            printf("%d\n", nextAdd);
+        scanf("%d %c %d", &curAdd, &c, &nextAdd);
+        ans[curAdd] = nextAdd;
     }
+    int joint = -1;
+    int start = add1;
+    while (add2 != -1) {
+        while (add1 != -1) {
+            if (add1 == add2) {
+                joint = add1;
+                break;
+            }
+            else {
+                add1 = ans[add1];
+            }
+        }
+        if (joint != -1)
+            break;
+        add2 = ans[add2];
+        add1 = start;
+    }
+    printf("%d", joint);
     return 0;
 }
