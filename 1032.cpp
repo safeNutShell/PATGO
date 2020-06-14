@@ -22,21 +22,18 @@ int main() {
         ans[curAdd] = nextAdd;
     }
     int joint = -1;
-    int start = add1;
+    map<int, int> chain2;
     while (add2 != -1) {
-        while (add1 != -1) {
-            if (add1 == add2) {
-                joint = add1;
-                break;
-            }
-            else {
-                add1 = ans[add1];
-            }
-        }
-        if (joint != -1)
-            break;
+        chain2[add2] = ans[add2];
         add2 = ans[add2];
-        add1 = start;
+    }
+    while (add1 != -1) {
+        if (chain2.count(add1) == 1) {
+            joint = add1;
+            break;
+        }
+        else
+            add1 = ans[add1];
     }
     printf("%d", joint);
     return 0;
