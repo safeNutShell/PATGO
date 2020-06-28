@@ -21,33 +21,38 @@ int main() {
 			cin >> a;
 			num.push_back(a);
 		}
-		int ptr = 0;
-		int len = 1;
-		vector<int> check;
 		bool flag = true;
-		for (int j = 1; j < n; j++) {
-			if (num[j] > num[j - 1]) {
-				check.push_back(num[ptr]);
-				if (len > m) {
+		vector<int> dp(n, 0);
+		vector<int> check;
+		dp[n - 1] = 1;
+		for (int j = n - 2; j >= 0; j--) {
+			if (num[j] > num[j + 1]) {
+				dp[j] = dp[j + 1] + 1;
+			}
+			else {
+				dp[j] = 1;
+				if (dp[j + 1] > m) {
 					flag = false;
 					break;
 				}
-				len = 1;
-				ptr = j;
+				check.push_back(num[j + 1]);
 			}
-			else if (num[j] < num[j - 1]) {
-				len++;
-			}
-			if (j == n - 1) {
-				check.push_back(num[ptr]);
-				if (len > m)
+			if (j == 0) {
+				if (dp[j] > m) {
 					flag = false;
+					break;
+				}
+				if (num[j] > num[j + 1]) {
+					check.push_back(num[j]);
+				}
 			}
 		}
-		for (int j = 0; j < check.size(); j++) {
-			if (j != 0 && check[j] < check[j - 1]) {
-				flag = false;
-				break;
+		if (check.size() > 1) {
+			for (int i = 1; i < check.size(); i++) {
+				if (check[i] > check[i - 1]) {
+					flag = false;
+					break;
+				}
 			}
 		}
 		if (flag)
