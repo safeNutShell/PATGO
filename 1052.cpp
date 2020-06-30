@@ -7,29 +7,51 @@
 #include<math.h>
 #include<map>
 #include<vector>
+#include<queue>
 //#define INT_MAX 2147483647
-
 using namespace std;
 
-bool cmp(pair<int, string> a, pair<int, string>b) {
-	return a.first < b.first;
+struct node {
+	int v;
+	string cur, next;
+};
+
+bool cmp(node a, node b) {
+	return a.v < b.v;
 }
 
 int main() {
-	int num, startAdd, val;
-	string thisAdd, nextAdd;
-	cin >> num >> startAdd;
-	vector<pair<int, string>>link;
-	while (num--) {
-		cin >> thisAdd >> val >> nextAdd;
-		link.push_back(make_pair(val, thisAdd));
+	int n, val;
+	string startAdd, thisAdd, nextAdd;
+	map<string,node>list;
+	vector<node>ans;
+	cin >> n >> startAdd;
+	if (n == 0) {
+		cout << 0 << ' ' << -1 << endl;
+		return 0;
 	}
-	sort(link.begin(), link.end(), cmp);
-	cout << link.size() << ' ' << link[0].second << endl;
-	for (int i = 0; i < link.size(); i++) {
-		cout << link[i].second << ' ' << link[i].first << ' ';
-		if (i < link.size() - 1)
-			cout << link[i + 1].second << endl;
+	while (n--) {
+		cin >> thisAdd >> val >> nextAdd;
+		node a;
+		a.v = val;
+		a.cur = thisAdd;
+		a.next = nextAdd;
+		list[thisAdd] = a;
+	}
+	//sort(list.begin(), list.end(), cmp);
+	string adr = startAdd;
+	int count = 0;
+	while (adr != "-1") {
+		count++;
+		ans.push_back(list[adr]);
+		adr = list[adr].next;
+	}
+	sort(ans.begin(), ans.end(), cmp);
+	cout << count << ' ' << ans[0].cur << endl;
+	for (int i = 0; i < count; i++) {
+		printf("%s %d ", ans[i].cur.c_str(), ans[i].v);
+		if (i < count - 1)
+			printf("%s\n", ans[i + 1].cur.c_str());
 		else
 			cout << -1 << endl;
 	}
