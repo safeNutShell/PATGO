@@ -11,52 +11,48 @@
 
 using namespace std;
 const int maxn = 2010;
-int n, k;
+int n, k, num[maxn], total[maxn];
 struct person {
 	int time;
-	int root;
-	person() {
-		time = 0;
-		root = -1;
-	}
+	int father;
+	person():time(0){}
 }Tree[maxn];
-map<string, int>mp;
+map<string, int>mp, rec;
 map<int, string>rmp;
 
-int findRoot(int a) {
-	int x = a;
-	while (Tree[a].root != -1) a = Tree[a].root;
-	while (Tree[x].root != -1) {
-		int tmp = x;
-		x = Tree[x].root;
-		Tree[tmp].root = a;
+int findRoot(int x) {
+	int a = x;
+	while (Tree[x].father != x) {
+		x = Tree[x].father;
 	}
-	return a;
+	while (Tree[a].father != a) {
+		int tmp = a;
+		a = Tree[a].father;
+		Tree[tmp].father = x;
+	}
+	return x;
 }
 
-void merge(int a, int b) {
-	a = findRoot(a);
-	b = findRoot(b);
-	if (a != b) {
-		if (Tree[a].time < Tree[b].time) {
-			Tree[a].root = b;
-		}
-		else {
-			Tree[b].root = a;
-		}
+void Union(int a, int b) {
+	int a1 = findRoot(a);
+	int b1 = findRoot(b);
+	if (a1 != b1) {
+		if (Tree[a].time < Tree[b].time)
+			Tree[a].father = b1;
+		else
+			Tree[b].father = a1;
 	}
 }
 
 int main() {
 	cin >> n >> k;
-	for (int i = 0; i < maxn; i++) {
-		Tree[i].root = -1;
-	}
 	string a, b;
-	int time, no = 0;
-	vector<pair<int, int>> tmp;
+	for (int i = 0; i < maxn; i++)
+		Tree[i].father = i;
+	int t, no = 0;
+	vector<pair<int, int>> ope;
 	for (int i = 0; i < n; i++) {
-		cin >> a >> b >> time;
+		cin >> a >> b >> t;
 		if (mp.count(a) == 0) {
 			rmp[no] = a;
 			mp[a] = no++;
@@ -65,31 +61,26 @@ int main() {
 			rmp[no] = b;
 			mp[b] = no++;
 		}
-		Tree[mp[a]].time += time;
-		Tree[mp[b]].time += time;
-		tmp.push_back(make_pair(mp[a], mp[b]));
+		Tree[mp[a]].time += t;
+		Tree[mp[b]].time += t;
+		ope.push_back(make_pair(mp[a], mp[b]));
 	}
-	for (int i = 0; i < tmp.size(); i++) {
-		merge(tmp[i].first, tmp[i].second);
-	}
-	int num[maxn] = { 0 };
-	int totalTime[maxn] = { 0 };
+	for (int i = 0; i < ope.size(); i++)
+		Union(ope[i].first, ope[i].second);
+	fill(num, num + maxn, 0);
+	fill(total, total + maxn, 0);
 	for (int i = 0; i < no; i++) {
-		num[findRoot(i)]++;
-		totalTime[findRoot(i)] += Tree[i].time;
+		int tmp = findRoot(i);
+		num[tmp]++;
+		total[tmp] += Tree[i].time;
 	}
-	vector<int> res;
 	for (int i = 0; i < no; i++) {
-		if (num[i] > 2 && totalTime[i] / 2 > k)
-			res.push_back(i);
+		if (num[i] > 2 && total[i] / 2 > k)
+			rec[rmp[i]] = num[i];
 	}
-	if (res.size() == 0)
-		cout << 0 << endl;
-	else {
-		cout << res.size() << endl;
-		for (int i = 0; i < res.size(); i++) {
-			cout << rmp[res[i]] << ' ' << num[res[i]] << endl;
-		}
+	cout << rec.size() << endl;
+	for (map<string, int>::iterator it = rec.begin(); it != rec.end(); it++) {
+		cout << it->first << ' ' << it->second << endl;
 	}
 	return 0;
 }
