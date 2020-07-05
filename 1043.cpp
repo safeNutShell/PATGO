@@ -8,96 +8,88 @@
 #include<map>
 #include<vector>
 //#define INT_MAX 2147483647
-
 using namespace std;
 
-int s;
-vector<int> res;
+bool flag = false;
+vector<int> pre, post, tmp;
 
-bool judge(vector<int> test, int start,int left,int right) {
-	if (left >= right && start >= 0&&start<test.size()) {
-		res.push_back(test[start]);
-		return true;
+typedef struct node* TN;
+struct node {
+	int val;
+	TN left, right;
+};
+
+
+void insert(TN &root, int data) {
+	if (root == NULL) {
+		root = new node;
+		root->val = data;
+		root->left = NULL;
+		root->right = NULL;
+		return;
 	}
-	int ptr = -1;
-	for (int i = left; i <= right; i++) {
-		if (test[i] < test[start])
-			continue;
-		else if (test[i] >= test[start]) {
-			ptr = i;
-			break;
-		}
-	}
-	if (ptr != -1) {
-		for (int i = ptr; i <= right; i++) {
-			if (test[i] < test[start])
-				return false;
-		}
-	}
-	bool child = judge(test, start + 1, start + 2, ptr - 1) && judge(test, ptr, ptr + 1, right);
-	if (child)
-		res.push_back(test[start]);
-	return child;
+	if (data < root->val)
+		insert(root->left, data);
+	else
+		insert(root->right, data);
 }
 
-bool judge2(vector<int> test, int start, int left, int right) {
-	if (left >= right && start >= 0 && start < test.size()) {
-		res.push_back(test[start]);
-		return true;
+void preorder(TN root) {
+	if (root == NULL)
+		return;
+	tmp.push_back(root->val);
+	if (flag) {
+		preorder(root->right);
+		preorder(root->left);
 	}
-	int ptr = -1;
-	for (int i = left; i <= right; i++) {
-		if (test[i] >= test[start])
-			continue;
-		else if (test[i] < test[start]) {
-			ptr = i;
-			break;
-		}
+	else {
+		preorder(root->left);
+		preorder(root->right);
 	}
-	if (ptr != -1) {
-		for (int i = ptr; i <= right; i++) {
-			if (test[i] >= test[start])
-				return false;
-		}
+}
+
+void postorder(TN root) {
+	if (root == NULL)
+		return;
+	if (flag) {
+		postorder(root->right);
+		postorder(root->left);
 	}
-	bool child = judge2(test, start + 1, start + 2, ptr - 1) && judge2(test, ptr, ptr + 1, right);
-	if (child)
-		res.push_back(test[start]);
-	return child;
+	else {
+		postorder(root->left);
+		postorder(root->right);
+	}
+	tmp.push_back(root->val);
 }
 
 int main() {
-	int num;
-	cin >> s;
-	vector<int> tree;
-	for (int i = 0; i < s; i++) {
-		cin >> num;
-		tree.push_back(num);
+	int n;
+	cin >> n;
+	TN root = NULL;
+	pre.resize(n);
+	for (int i = 0; i < n; i++) {
+		cin >> pre[i];
+		insert(root, pre[i]);
 	}
-	if (judge(tree, 0, 1, s - 1)) {
+	preorder(root);
+	if (tmp != pre) {
+		tmp.clear();
+		flag = true;
+		preorder(root);
+	}
+	if (tmp == pre) {
+		tmp.clear();
+		postorder(root);
 		cout << "YES" << endl;
-		for (int i = 0; i < res.size(); i++) {
-			cout << res[i];
-			if (i < res.size() - 1)
+		for (int i = 0; i < tmp.size(); i++) {
+			cout << tmp[i];
+			if (i < tmp.size() - 1)
 				cout << ' ';
-			else if (i == res.size() - 1)
+			else
 				cout << endl;
 		}
 	}
-	else {
-		if (judge2(tree, 0, 1, s - 1)) {
-			cout << "YES" << endl;
-			for (int i = 0; i < res.size(); i++) {
-				cout << res[i];
-				if (i < res.size() - 1)
-					cout << ' ';
-				else if (i == res.size() - 1)
-					cout << endl;
-			}
-		}
-		else {
-			cout << "NO" << endl;
-		}
-	}
+	else
+		cout << "NO" << endl;
 	return 0;
 }
